@@ -1,0 +1,6 @@
+{
+  "name": "STOCKMIND AI — Tokenized Stock Intelligence on Base",
+  "description": "Institutional-grade financial operating platform for tokenized stocks on Base. Real onchain intelligence, asset exploration, and autonomous financial agents.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
