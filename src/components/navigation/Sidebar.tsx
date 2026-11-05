@@ -1,16 +1,13 @@
 import React from 'react';
 import {
   LayoutDashboard,
-  TrendingUp,
-  Brain,
   PieChart,
-  Blocks,
+  ShieldCheck,
   Bot,
-  Zap,
-  Bookmark,
-  FileText,
   Settings,
-  ExternalLink,
+  Flame,
+  Activity,
+  Layers,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -19,72 +16,73 @@ interface SidebarProps {
   isTestnet: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, isTestnet }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab }) => {
   const navItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'markets', label: 'Markets', icon: TrendingUp },
-    { id: 'ai', label: 'AI Intelligence', icon: Brain },
-    { id: 'portfolio', label: 'Portfolio', icon: PieChart },
-    { id: 'onchain', label: 'Onchain Activity', icon: Blocks },
-    { id: 'agents', label: 'AI Agents', icon: Bot },
-    { id: 'automations', label: 'Automations', icon: Zap },
-    { id: 'watchlist', label: 'Watchlist', icon: Bookmark },
-    { id: 'reports', label: 'Reports', icon: FileText },
+    { id: 'agents', label: 'STOCKMIND AGENT', icon: Bot },
+    { id: 'contracts', label: '9 Contrats Tokenisés & Audit', icon: ShieldCheck },
+    { id: 'portfolio', label: 'Portfolio & Positions', icon: PieChart },
+    { id: 'onchain', label: 'Onchain Activity', icon: Activity },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
-    <aside className="w-64 bg-[#070a12] border-r border-[#1a2333] flex flex-col shrink-0 select-none">
-      {/* Platform Sub-Header */}
-      <div className="px-5 py-3 border-b border-[#141b29] flex items-center justify-between text-xs text-slate-400">
-        <span className="font-semibold text-slate-300 tracking-wider text-[11px] uppercase">
-          Financial Terminal
-        </span>
-        <span className="font-mono text-[10px] text-emerald-400">
-          {isTestnet ? 'Base Sepolia' : 'Base 8453'}
-        </span>
-      </div>
+    <aside className="w-18 md:w-20 bg-[#0c1017] border-r border-[#1a2333] flex flex-col items-center py-6 shrink-0 select-none z-20">
+      {/* Top Brand Squircle Emblem */}
+      <button
+        onClick={() => onSelectTab('overview')}
+        className="w-11 h-11 rounded-2xl bg-[#5ea37e] hover:bg-[#6cb38c] flex items-center justify-center text-[#0c1017] shadow-lg shadow-[#5ea37e]/20 transition-all focus:outline-none group mb-8"
+        title="STOCKMIND AI"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className="w-6 h-6 fill-current transition-transform group-hover:scale-105"
+        >
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 10.9 12 11.5 12 13h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .88-.36 1.68-.93 2.25z" fill="none"/>
+          <path d="M7 14c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S4 4.34 4 6v5c0 1.66 1.34 3 3 3zm6 4c2.21 0 4-1.79 4-4v-1h-2v1c0 1.1-.9 2-2 2s-2-.9-2-2v-1H9v1c0 2.21 1.79 4 4 4zm4-9h-2V6c0-1.1-.9-2-2-2s-2 .9-2 2H9c0-2.21 1.79-4 4-4s4 1.79 4 4v3z" />
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" fill="none" />
+          <path d="M8 12c1.5-2 3.5-3 5.5-1.5s2.5 3.5 4 3" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      </button>
 
-      {/* Navigation List */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      {/* Navigation Icons Rail with Ambient Capsule Glow on Active */}
+      <nav className="flex-1 flex flex-col items-center space-y-4">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+
           return (
-            <button
-              key={item.id}
-              onClick={() => onSelectTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all text-left ${
-                isActive
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-[#0f1728]'
-              }`}
-            >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`} />
-              <span className="truncate">{item.label}</span>
-            </button>
+            <div key={item.id} className="relative group flex items-center justify-center">
+              {/* Glowing vertical pill aura behind active icon */}
+              {isActive && (
+                <div className="absolute inset-0 -m-1 rounded-2xl bg-gradient-to-b from-[#5ea37e]/30 via-[#5ea37e]/15 to-transparent blur-md"></div>
+              )}
+
+              <button
+                onClick={() => onSelectTab(item.id)}
+                className={`relative w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                  isActive
+                    ? 'bg-[#18231e] text-[#d8efa3] border border-[#5ea37e]/40 shadow-inner'
+                    : 'text-[#8e9aa8] hover:text-white hover:bg-[#151c27]'
+                }`}
+                title={item.label}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-[#d8efa3]' : 'text-[#8e9aa8]'}`} />
+              </button>
+
+              {/* Tooltip on Hover */}
+              <div className="absolute left-full ml-3 px-2.5 py-1 rounded-lg bg-[#18202c] border border-[#2a3444] text-xs text-white font-medium whitespace-nowrap shadow-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                {item.label}
+              </div>
+            </div>
           );
         })}
       </nav>
 
-      {/* Base Stocks Maxxing Competition Notice */}
-      <div className="p-3 mx-3 mb-4 rounded-lg bg-[#0d1424] border border-[#1e2a3f] text-[11px] text-slate-400 space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="font-semibold text-white">Base Stocks Maxxing</span>
-          <span className="text-[10px] text-emerald-400 font-mono">2026</span>
-        </div>
-        <p className="text-[11px] text-slate-400 leading-tight">
-          Track: Agentic Stock Finance on Base L2. Verified onchain utility.
-        </p>
-        <a
-          href="https://www.base.org/stocksmaxxing"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1 text-[10px] text-emerald-400 hover:underline pt-1"
-        >
-          <span>Competition Guidelines</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
+      {/* Bottom Status Dot */}
+      <div className="flex flex-col items-center gap-1">
+        <span className="w-2 h-2 rounded-full bg-[#5ea37e] animate-pulse"></span>
+        <span className="text-[9px] font-mono text-[#8e9aa8]">8453</span>
       </div>
     </aside>
   );

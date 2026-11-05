@@ -3,11 +3,12 @@ import { TopBar } from './components/navigation/TopBar';
 import { Sidebar } from './components/navigation/Sidebar';
 import { ToastContainer, ToastMessage } from './components/common/Toast';
 import { OverviewView } from './components/views/OverviewView';
-import { MarketsView } from './components/views/MarketsView';
-import { AiIntelligenceView } from './components/views/AiIntelligenceView';
+import { TokenizedContractsView } from './components/views/TokenizedContractsView';
+import { AiAgentsView } from './components/views/AiAgentsView';
 import { PortfolioView } from './components/views/PortfolioView';
 import { OnchainActivityView } from './components/views/OnchainActivityView';
-import { AiAgentsView } from './components/views/AiAgentsView';
+import { MarketsView } from './components/views/MarketsView';
+import { AiIntelligenceView } from './components/views/AiIntelligenceView';
 import { AutomationsView } from './components/views/AutomationsView';
 import { WatchlistView } from './components/views/WatchlistView';
 import { ReportsView } from './components/views/ReportsView';
@@ -32,6 +33,8 @@ export default function App() {
     'dinari-sbux-d',
   ]);
   const [targetStockForAi, setTargetStockForAi] = useState<TokenizedStock | null>(null);
+  const [preselectedAgentStock, setPreselectedAgentStock] = useState<string>('bCSPX');
+  const [preselectedAgentType, setPreselectedAgentType] = useState<string>('research');
 
   // Portfolio tracked positions (defaulting to institutional holdings in verified Base contracts)
   const [portfolioPositions, setPortfolioPositions] = useState<PortfolioPosition[]>([
@@ -126,16 +129,16 @@ export default function App() {
       setWalletAddress(address);
       addToast(
         'success',
-        'Wallet Connected',
-        `Connected address: ${address.slice(0, 6)}...${address.slice(-4)}`
+        'Portefeuille Connecté',
+        `Adresse connectée : ${address.slice(0, 6)}...${address.slice(-4)}`
       );
 
       // Verify chain is Base (8453)
       if (chainId !== 8453 && chainId !== 84532) {
         addToast(
           'info',
-          'Network Switching',
-          'Switching your wallet to Base Mainnet (Chain ID 8453)...'
+          'Basculement Réseau',
+          'Changement vers Base Mainnet (Chain ID 8453)...'
         );
         await switchToBase(isTestnet);
       }
@@ -145,8 +148,8 @@ export default function App() {
       setWalletAddress(demoAddress);
       addToast(
         'info',
-        'Institutional Monitor Active',
-        `No Web3 extension detected. Now monitoring Base Treasury: ${demoAddress.slice(0, 6)}...${demoAddress.slice(-4)}`
+        'Mode Auditeur Institutionnel Actif',
+        `Portefeuille Web3 non détecté. Surveillance du Trésor Base : ${demoAddress.slice(0, 6)}...${demoAddress.slice(-4)}`
       );
     } finally {
       setIsConnecting(false);
@@ -155,32 +158,37 @@ export default function App() {
 
   const handleDisconnectWallet = () => {
     setWalletAddress(null);
-    addToast('info', 'Wallet Disconnected', 'Switched to public read-only terminal mode.');
+    addToast('info', 'Portefeuille Déconnecté', 'Basculé en mode terminal public en lecture seule.');
   };
 
   // Watchlist
   const handleToggleWatchlist = (stock: TokenizedStock) => {
     if (watchlistStockIds.includes(stock.id)) {
       setWatchlistStockIds((prev) => prev.filter((id) => id !== stock.id));
-      addToast('info', 'Removed from Watchlist', `${stock.symbol} removed.`);
+      addToast('info', 'Retiré de la Watchlist', `${stock.symbol} retiré.`);
     } else {
       setWatchlistStockIds((prev) => [...prev, stock.id]);
-      addToast('success', 'Added to Watchlist', `${stock.symbol} tracked.`);
+      addToast('success', 'Ajouté à la Watchlist', `${stock.symbol} suivi.`);
     }
   };
 
   const handleSelectStockForAi = (stock: TokenizedStock) => {
     setTargetStockForAi(stock);
-    setActiveTab('ai');
+    setPreselectedAgentStock(stock.symbol);
+    setActiveTab('agents');
   };
 
-  const handleRunAgent = (agentType: string) => {
+  const handleRunAgent = (agentType: string, stockSymbol?: string) => {
+    setPreselectedAgentType(agentType);
+    if (stockSymbol) {
+      setPreselectedAgentStock(stockSymbol);
+    }
     setActiveTab('agents');
   };
 
   return (
-    <div className="flex h-screen bg-[#090d16] text-[#e2e8f0] overflow-hidden">
-      {/* Sidebar Navigation */}
+    <div className="flex h-screen bg-[#0c1017] text-[#e2e8f0] overflow-hidden antialiased">
+      {/* Sleek Vertical Icon Sidebar */}
       <Sidebar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
@@ -189,7 +197,7 @@ export default function App() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* TopBar with 3-Zone Contract */}
+        {/* TopBar with Autonomous Agent Pill & Controls */}
         <TopBar
           activeTab={activeTab}
           walletAddress={walletAddress}
@@ -198,9 +206,10 @@ export default function App() {
           networkTelemetry={networkTelemetry}
           isConnecting={isConnecting}
           onSelectTab={setActiveTab}
+          onRunAgent={handleRunAgent}
         />
 
-        {/* View Content Port */}
+        {/* View Content Viewport */}
         <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6">
           {activeTab === 'overview' && (
             <OverviewView
@@ -209,6 +218,34 @@ export default function App() {
               onSelectTab={setActiveTab}
               onSelectStock={handleSelectStockForAi}
               onRunAgent={handleRunAgent}
+            />
+          )}
+
+          {activeTab === 'agents' && (
+            <AiAgentsView
+              stocks={VERIFIED_TOKENIZED_STOCKS}
+              portfolioPositions={portfolioPositions}
+              preselectedStockSymbol={preselectedAgentStock}
+              preselectedAgentType={preselectedAgentType}
+              onOpenTxSimulation={() => setActiveTab('onchain')}
+            />
+          )}
+
+          {activeTab === 'contracts' && (
+            <TokenizedContractsView
+              stocks={VERIFIED_TOKENIZED_STOCKS}
+              onRunAgent={handleRunAgent}
+              onSelectStock={handleSelectStockForAi}
+            />
+          )}
+
+          {activeTab === 'portfolio' && (
+            <PortfolioView
+              walletAddress={walletAddress}
+              positions={portfolioPositions}
+              stocks={VERIFIED_TOKENIZED_STOCKS}
+              onConnectWallet={handleConnectWallet}
+              onSelectStockForAi={handleSelectStockForAi}
             />
           )}
 
@@ -228,28 +265,10 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'portfolio' && (
-            <PortfolioView
-              walletAddress={walletAddress}
-              positions={portfolioPositions}
-              stocks={VERIFIED_TOKENIZED_STOCKS}
-              onConnectWallet={handleConnectWallet}
-              onSelectStockForAi={handleSelectStockForAi}
-            />
-          )}
-
           {activeTab === 'onchain' && (
             <OnchainActivityView
               telemetry={networkTelemetry}
               onRefreshTelemetry={refreshTelemetry}
-            />
-          )}
-
-          {activeTab === 'agents' && (
-            <AiAgentsView
-              stocks={VERIFIED_TOKENIZED_STOCKS}
-              portfolioPositions={portfolioPositions}
-              onOpenTxSimulation={() => setActiveTab('onchain')}
             />
           )}
 
