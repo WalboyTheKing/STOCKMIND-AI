@@ -13,6 +13,7 @@ import { AutomationsView } from './components/views/AutomationsView';
 import { WatchlistView } from './components/views/WatchlistView';
 import { ReportsView } from './components/views/ReportsView';
 import { SettingsView } from './components/views/SettingsView';
+import { StocksMaxxingView } from './components/views/StocksMaxxingView';
 
 import { VERIFIED_TOKENIZED_STOCKS } from './data/tokenizedStocks';
 import { TokenizedStock, PortfolioPosition, NetworkTelemetry } from './types';
@@ -218,6 +219,15 @@ export default function App() {
               onSelectTab={setActiveTab}
               onSelectStock={handleSelectStockForAi}
               onRunAgent={handleRunAgent}
+            />
+          )}
+
+          {activeTab === 'maxxing' && (
+            <StocksMaxxingView
+              stocks={VERIFIED_TOKENIZED_STOCKS}
+              portfolioPositions={portfolioPositions}
+              onSelectStockForAi={handleSelectStockForAi}
+              onTriggerToast={(t, title, m) => addToast(t, title, m)}
             />
           )}
 

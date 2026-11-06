@@ -37,11 +37,13 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [showCommandMenu, setShowCommandMenu] = useState(false);
 
   const quickCommands = [
+    { label: '🔥 Explore Stocks Maxxing Season (10 Features)', action: () => onSelectTab('maxxing') },
     { label: 'Audit bCSPX Reserves & Custody (Maerki Baumann)', action: () => onRunAgent('research', 'bCSPX') },
     { label: 'Audit SBUX.d SEC Form TA-1 & Dividend Flow', action: () => onRunAgent('research', 'SBUX.d') },
     { label: 'Run Full Portfolio Beta & Risk Audit', action: () => onRunAgent('portfolio') },
     { label: 'Inspect 9 Complete Tokenized Contract Addresses', action: () => onSelectTab('contracts') },
     { label: 'Simulate Weekend De-Pegging Stress-Test', action: () => onRunAgent('risk') },
+    { label: 'Launch In-App Tokenized Stocks SDK Simulator', action: () => onSelectTab('maxxing') },
   ];
 
   const handleCommandSelect = (cmdAction: () => void) => {

@@ -158,3 +158,179 @@ export async function generateInstitutionalReport(params: {
     tags: ['Base Mainnet', 'Tokenized Equities', 'RWA', 'Institutional'],
   };
 }
+
+export async function fetchAgentDiary(params?: {
+  date?: string;
+  currentHoldings?: string[];
+  marketConditions?: string;
+}) {
+  const res = await fetch('/api/stocks-maxxing/agent-diary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params || {}),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch agent diary');
+  }
+  return res.json();
+}
+
+export async function fetchWeekendFeeds() {
+  const res = await fetch('/api/stocks-maxxing/weekend-feed');
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch weekend feeds');
+  }
+  return res.json();
+}
+
+export async function estimatePaymasterGas(params?: { network?: string; gasLimit?: number }) {
+  const res = await fetch('/api/stocks-maxxing/sdk/estimate-gas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params || {}),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to estimate gas');
+  }
+  return res.json();
+}
+
+export async function fetchNeobrokerRates() {
+  const res = await fetch('/api/stocks-maxxing/neobroker/rates');
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch neobroker rates');
+  }
+  return res.json();
+}
+
+export async function getNeobrokerQuote(params: {
+  country: string;
+  localAmount: string;
+  targetStockSymbol: string;
+}) {
+  const res = await fetch('/api/stocks-maxxing/neobroker/quote', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to compute neobroker quote');
+  }
+  return res.json();
+}
+
+export async function fetchYieldVaults() {
+  const res = await fetch('/api/stocks-maxxing/yield-vaults');
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch yield vaults');
+  }
+  return res.json();
+}
+
+export async function simulateLeverage(params: {
+  stockSymbol: string;
+  collateralShares: number;
+  leverageRatio: number;
+}) {
+  const res = await fetch('/api/stocks-maxxing/leverage/simulate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to simulate leverage');
+  }
+  return res.json();
+}
+
+export async function fetchAmmPoolStatus() {
+  const res = await fetch('/api/stocks-maxxing/amm/pool-status');
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch pool status');
+  }
+  return res.json();
+}
+
+export async function generateSafePayload(params: {
+  basketType: string;
+  totalUsd?: number;
+}) {
+  const res = await fetch('/api/stocks-maxxing/dao/safepayload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to generate Safe payload');
+  }
+  return res.json();
+}
+
+export async function fetchPredictionMarkets() {
+  const res = await fetch('/api/stocks-maxxing/prediction/markets');
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch prediction markets');
+  }
+  return res.json();
+}
+
+export async function calculateDerivativesBasis(params: {
+  stockSymbol: string;
+  spotShares: number;
+}) {
+  const res = await fetch('/api/stocks-maxxing/derivatives/basis', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to calculate basis');
+  }
+  return res.json();
+}
+
+export interface ExternalProviderInfo {
+  id: string;
+  name: string;
+  variable: string;
+  isMandatory: boolean;
+  online: boolean;
+  isConfigured?: boolean;
+  latencyMs?: number;
+  blockHeight?: number;
+  endpoint?: string;
+  isCustom?: boolean;
+  mode: string;
+  officialUrl: string;
+  docsUrl?: string;
+  paymentMethods?: string[];
+  error?: string | null;
+}
+
+export async function fetchProvidersStatus(): Promise<{
+  success: boolean;
+  timestamp: string;
+  zeroKeyResiliencePolicy: string;
+  providers: ExternalProviderInfo[];
+}> {
+  const res = await fetch('/api/stocks-maxxing/providers-status');
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error || 'Failed to fetch providers status');
+  }
+  return res.json();
+}
+
+
+

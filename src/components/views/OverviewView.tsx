@@ -90,8 +90,15 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </p>
         </div>
 
-        {/* Quick jump to 9 Verified Contracts */}
-        <div className="flex items-center gap-2">
+        {/* Quick jump to Stocks Maxxing & 9 Verified Contracts */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => onSelectTab('maxxing')}
+            className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-black bg-[#d8efa3] hover:bg-[#cbe690] shadow-sm transition-all flex items-center gap-1.5"
+          >
+            <Flame className="w-3.5 h-3.5 text-amber-900" />
+            <span>Stocks Maxxing Season (10 Features)</span>
+          </button>
           <button
             onClick={() => onSelectTab('contracts')}
             className="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#d8efa3] bg-[#1d2a23] hover:bg-[#25372d] border border-[#d8efa3]/30 transition-all flex items-center gap-1.5"
@@ -101,9 +108,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </button>
           <button
             onClick={() => onRunAgent('portfolio', 'bCSPX')}
-            className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-black bg-[#d8efa3] hover:bg-[#cbe690] transition-all flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-full text-xs font-medium text-white bg-[#1a2333] hover:bg-[#222e42] border border-[#2e3b50] transition-all flex items-center gap-1.5"
           >
-            <Bot className="w-3.5 h-3.5" />
+            <Bot className="w-3.5 h-3.5 text-[#5ea37e]" />
             <span>STOCKMIND AGENT</span>
           </button>
         </div>

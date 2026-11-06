@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Settings,
   ShieldCheck,
@@ -9,8 +9,13 @@ import {
   CheckCircle2,
   Server,
   Zap,
+  RefreshCw,
+  KeyRound,
+  Radio,
+  AlertTriangle,
 } from 'lucide-react';
 import { NetworkTelemetry } from '../../types';
+import { fetchProvidersStatus, ExternalProviderInfo } from '../../services/api';
 
 interface SettingsViewProps {
   isTestnet: boolean;
@@ -23,9 +28,28 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onToggleTestnet,
   telemetry,
 }) => {
-  const [customRpc, setCustomRpc] = useState('');
   const [currency, setCurrency] = useState('USD');
   const [riskTolerance, setRiskTolerance] = useState('Moderate Institutional');
+  const [providers, setProviders] = useState<ExternalProviderInfo[]>([]);
+  const [isLoadingProviders, setIsLoadingProviders] = useState(false);
+  const [lastCheckTime, setLastCheckTime] = useState<string | null>(null);
+
+  const loadProviders = async () => {
+    setIsLoadingProviders(true);
+    try {
+      const data = await fetchProvidersStatus();
+      setProviders(data.providers || []);
+      setLastCheckTime(new Date().toLocaleTimeString());
+    } catch (err) {
+      console.error('Failed to load providers status:', err);
+    } finally {
+      setIsLoadingProviders(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProviders();
+  }, []);
 
   const competitionMilestones = [
     {
@@ -148,6 +172,119 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               RPC: https://sepolia.base.org · Explorer: sepolia.basescan.org
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* External Providers & API Keys Diagnostic Panel */}
+      <div className="p-5 rounded-xl bg-[#0b101d] border border-[#1a2335] space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
+              <KeyRound className="w-4 h-4" />
+              <span>INTÉGRATIONS OFFICIELLES & CONNECTIVITÉ MULTI-RAIL</span>
+            </div>
+            <h3 className="text-sm font-semibold text-white mt-0.5">
+              État des 6 Fournisseurs Externes (Mode Résilient Sans Clé Actif)
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Architecture Zero-Key : l'application fonctionne à 100% sans aucune clé obligatoire grâce aux RPC publics Base, aux flux Pyth Hermes libres et au routage DEX natif.
+            </p>
+          </div>
+
+          <button
+            onClick={loadProviders}
+            disabled={isLoadingProviders}
+            className="self-start sm:self-auto px-3 py-1.5 bg-[#141b2a] hover:bg-[#1a2337] text-slate-200 border border-[#202b40] rounded-lg text-xs font-mono flex items-center gap-2 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingProviders ? 'animate-spin text-emerald-400' : 'text-slate-400'}`} />
+            <span>Tester les Connexions</span>
+            {lastCheckTime && <span className="text-[10px] text-slate-500">({lastCheckTime})</span>}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
+          {providers.map((p) => (
+            <div
+              key={p.id}
+              className="p-4 rounded-xl bg-[#0e1424] border border-[#1a2335] flex flex-col justify-between space-y-3"
+            >
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <span className="text-xs font-semibold text-white block">{p.name}</span>
+                    <span className="text-[10px] font-mono text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                      {p.variable}
+                    </span>
+                  </div>
+
+                  <span
+                    className={`inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-full shrink-0 ${
+                      p.online
+                        ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                    }`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        p.online ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                      }`}
+                    />
+                    {p.online ? 'Connecté' : 'Mode Fallback'}
+                  </span>
+                </div>
+
+                <div className="mt-2.5 space-y-1.5 text-xs text-slate-400">
+                  <div className="flex justify-between items-center text-[11px] font-mono">
+                    <span className="text-slate-500">Mode :</span>
+                    <span className="text-slate-300 text-right truncate max-w-[160px]">{p.mode}</span>
+                  </div>
+
+                  {p.latencyMs !== undefined && (
+                    <div className="flex justify-between items-center text-[11px] font-mono">
+                      <span className="text-slate-500">Latence :</span>
+                      <span className="text-emerald-400">{p.latencyMs} ms</span>
+                    </div>
+                  )}
+
+                  {p.blockHeight !== undefined && p.blockHeight > 0 && (
+                    <div className="flex justify-between items-center text-[11px] font-mono">
+                      <span className="text-slate-500">Bloc actuel :</span>
+                      <span className="text-white">#{p.blockHeight.toLocaleString()}</span>
+                    </div>
+                  )}
+
+                  {p.endpoint && (
+                    <div className="text-[10px] font-mono text-slate-500 truncate pt-1">
+                      Endpoint: {p.endpoint}
+                    </div>
+                  )}
+
+                  {p.paymentMethods && (
+                    <div className="text-[10px] text-slate-400 pt-1">
+                      <span className="text-slate-500 block">Canaux supportés :</span>
+                      {p.paymentMethods.join(' · ')}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-[#162032] flex items-center justify-between text-[11px]">
+                <span className="text-slate-500 font-mono text-[10px]">
+                  {p.isMandatory ? 'Clé Requise' : 'Optionnel (Sans clé)'}
+                </span>
+
+                <a
+                  href={p.officialUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-mono transition-colors"
+                >
+                  <span>Doc Officielle</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

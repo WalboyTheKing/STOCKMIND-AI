@@ -19,6 +19,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab }) => {
   const navItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'maxxing', label: 'Stocks Maxxing Season (10 Initiatives)', icon: Flame },
     { id: 'agents', label: 'STOCKMIND AGENT', icon: Bot },
     { id: 'contracts', label: '9 Contrats Tokenisés & Audit', icon: ShieldCheck },
     { id: 'portfolio', label: 'Portfolio & Positions', icon: PieChart },
